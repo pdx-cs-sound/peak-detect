@@ -10,12 +10,14 @@
 import wave
 import audioop
 from sys import stdin, argv
+from math import sqrt
 
 # Read the file and remember info about it.
 waveRead = wave.open(argv[1], 'rb')
 nFrames = waveRead.getnframes()
 nChannels = waveRead.getnchannels()
 bytesPerSample = waveRead.getsampwidth()
+frameRate = waveRead.getframerate()
 waveData = waveRead.readframes(nFrames)
 waveRead.close()
 
@@ -38,10 +40,25 @@ for f in frames:
         t += c
     monoFrames.append(t / nChannels)
 
-# Find and display min and max samples.
-minSample = monoFrames[0]
-maxSample = monoFrames[0]
-for sample in monoFrames:
-    minSample = min(sample, minSample)
-    maxSample = max(sample, maxSample)
-print(minSample, maxSample)
+# Calculate parameters for window.
+bigWindowWidth = int(frameRate * 0.2)
+smallWindowWidth = int(frameRate * 0.02)
+assert smallWindowWidth <= bigWindowWidth
+halfWindowWidth = bigWindowWidth // 2
+
+# Pad audio out for easier averaging.
+monoFrames = [0]*halfWindowWidth + monoFrames + [0]*halfWindowWidth
+
+# Apply windows everywhere looking for RMS peaks.
+for fi in range(nFrames):
+    def calcPower(windowWidth):
+        t = 0
+        ww = windowWidth // 2
+        for wi in range(fi - ww, fi + ww):
+            t += monoFrames[wi]**2
+        return sqrt(t) / windowWidth
+
+    widePower = calcPower(bigWindowWidth)
+    narrowPower = calcPower(smallWindowWidth)
+    if (narrowPower >= 5 * widePower):
+        print(fi / frameRate, narrowPower, widePower)
