@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-# Copyright © 2015 Bart Massey
+# Copyright (c) 2015 Bart and Ben Massey
+# [This program is licensed under the GPL version 3 or later.]
+# Please see the file COPYING in the source
+# distribution of this software for license terms.
 
 # Peak detector for Guitar Hero style charting.
 
