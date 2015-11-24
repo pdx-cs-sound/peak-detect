@@ -50,7 +50,7 @@ halfWindowWidth = bigWindowWidth // 2
 monoFrames = [0]*halfWindowWidth + monoFrames + [0]*halfWindowWidth
 
 # Apply windows everywhere looking for RMS peaks.
-for fi in range(nFrames):
+for fi in range(halfWindowWidth, nFrames - halfWindowWidth):
     def calcPower(windowWidth):
         t = 0
         ww = windowWidth // 2
