@@ -61,4 +61,4 @@ for fi in range(halfWindowWidth, nFrames - halfWindowWidth):
     widePower = calcPower(bigWindowWidth)
     narrowPower = calcPower(smallWindowWidth)
     if widePower > 0 and narrowPower >= 5 * widePower:
-        print(fi / frameRate, narrowPower / widePower)
+        print((fi - halfWindowWidth) / frameRate, narrowPower / widePower)
