@@ -14,6 +14,7 @@ import wave
 import audioop
 from sys import stdin, argv
 from math import sqrt
+import numpy as np
 
 # Read the file and remember info about it.
 waveRead = wave.open(argv[1], 'rb')
@@ -49,22 +50,22 @@ smallWindowWidth = int(frameRate * 0.05)
 assert smallWindowWidth <= bigWindowWidth
 halfWindowWidth = bigWindowWidth // 2
 stepWidth = int(frameRate * 0.05)
+powerRatio = 5
 
 # Pad audio out for easier averaging.
 monoFrames = [0]*halfWindowWidth + monoFrames + [0]*halfWindowWidth
+monoFrames = np.array(monoFrames)
 
 # Apply windows everywhere looking for RMS peaks.
 for fi in range(halfWindowWidth, nFrames - halfWindowWidth, stepWidth):
     def calcPower(windowWidth):
-        t = 0
         ww = windowWidth // 2
-        for wi in range(fi - ww, fi + ww):
-            t += monoFrames[wi]**2
+        t = sum(monoFrames[fi - ww:fi + ww]**2)
         return sqrt(t) / windowWidth
 
     widePower = calcPower(bigWindowWidth)
     narrowPower = calcPower(smallWindowWidth)
-    if widePower > 0 and narrowPower >= 5 * widePower:
+    if widePower > 0 and narrowPower >= powerRatio * widePower:
         secs = (fi - halfWindowWidth) / frameRate
         ratio = narrowPower / widePower
         print("%.3g %.4g" % (secs, ratio))
