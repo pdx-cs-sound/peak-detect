@@ -44,16 +44,17 @@ for f in frames:
     monoFrames.append(t / nChannels)
 
 # Calculate parameters for window.
-bigWindowWidth = int(frameRate * 0.2)
-smallWindowWidth = int(frameRate * 0.02)
+bigWindowWidth = int(frameRate * 0.5)
+smallWindowWidth = int(frameRate * 0.05)
 assert smallWindowWidth <= bigWindowWidth
 halfWindowWidth = bigWindowWidth // 2
+stepWidth = int(frameRate * 0.05)
 
 # Pad audio out for easier averaging.
 monoFrames = [0]*halfWindowWidth + monoFrames + [0]*halfWindowWidth
 
 # Apply windows everywhere looking for RMS peaks.
-for fi in range(halfWindowWidth, nFrames - halfWindowWidth):
+for fi in range(halfWindowWidth, nFrames - halfWindowWidth, stepWidth):
     def calcPower(windowWidth):
         t = 0
         ww = windowWidth // 2
